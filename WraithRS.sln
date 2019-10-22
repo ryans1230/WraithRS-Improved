@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29230.47
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WraithRS.Client", "WraithRS.Client.csproj", "{EB668A2E-1DF5-449E-B1FC-444EF8136A79}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB668A2E-1DF5-449E-B1FC-444EF8136A79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB668A2E-1DF5-449E-B1FC-444EF8136A79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB668A2E-1DF5-449E-B1FC-444EF8136A79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB668A2E-1DF5-449E-B1FC-444EF8136A79}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3E48A8B2-0788-4EBA-9E0B-4E246FBE1284}
+	EndGlobalSection
+EndGlobal
