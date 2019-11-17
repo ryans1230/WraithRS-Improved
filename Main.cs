@@ -10,7 +10,7 @@ namespace Dojrp.Fivem.WraithRS.Client
 {
     public class Main : BaseScript
     {
-        protected bool radarEnabled, hidden, frontFast, rearFast, locked, debugging = false;
+        protected bool radarEnabled, hidden, frontFast, rearFast, locked, debugging, calibrated = false;
         protected RadarInfo radarInfo = new RadarInfo();
 
         public Main()
@@ -19,11 +19,28 @@ namespace Dojrp.Fivem.WraithRS.Client
 
         }
 
-        [Command("radardebug")]
-        private void DebugRadar()
+        [Command("radar")]
+        private async void RadarCommand(int src, List<object> args, string raw)
         {
-            debugging = !debugging;
-            TriggerEvent("wk:radarRC");
+
+            if (args.Count == 0)
+                return;
+
+            string cmd = args[0].ToString();
+
+            if (cmd == "debug")
+            {
+                debugging = !debugging;
+                TriggerEvent("wk:radarRC");
+            } else if (cmd == "calibrate")
+            {
+                Screen.ShowNotification("~b~Calibrating radar. . . .");
+                await Delay((new Random().Next(1000, 2500)));
+
+                Screen.ShowNotification("~b~Radar has been calibrated!");
+                calibrated = true;
+            }
+
         }
 
         [Tick]
@@ -422,6 +439,9 @@ namespace Dojrp.Fivem.WraithRS.Client
             }
         }
 
+        //
+        //  MAIN RADAR TICK
+        //
         private void ManageVehicleRadar()
         {
             if (!radarEnabled)
@@ -494,6 +514,17 @@ namespace Dojrp.Fivem.WraithRS.Client
                     if (API.HasEntityClearLosToEntity(player.Handle, fwdVeh.Handle, 17))
                     {
                         double fwdVehSpeed = round(GetVehSpeed(fwdVeh));
+                        // Radar calibration
+                        if (!calibrated)
+                        {
+                            bool shouldSubtract = new Random().NextDouble() > 0.5;
+                            int toChange = new Random().Next(7);
+                            if (shouldSubtract)
+                                fwdVehSpeed -= toChange;
+                            else
+                                fwdVehSpeed += toChange;
+                        }
+
                         double fwdVehHeading = round(fwdVeh.Heading);
                         int dir = IsEntityInMyHeading(h, fwdVehHeading, 100);
 
@@ -578,6 +609,17 @@ namespace Dojrp.Fivem.WraithRS.Client
                     if (API.HasEntityClearLosToEntity(player.Handle, bwdVeh.Handle, 17))
                     {
                         double bwdVehSpeed = round(GetVehSpeed(bwdVeh));
+                        // Radar calibration
+                        if (!calibrated)
+                        {
+                            bool shouldSubtract = new Random().NextDouble() > 0.5;
+                            int toChange = new Random().Next(7);
+                            if (shouldSubtract)
+                                bwdVehSpeed -= toChange;
+                            else
+                                bwdVehSpeed += toChange;
+                        }
+
                         double bwdVehHeading = round(bwdVeh.Heading);
                         int dir = IsEntityInMyHeading(h, bwdVehHeading, 100);
 
@@ -661,6 +703,17 @@ namespace Dojrp.Fivem.WraithRS.Client
                     if (API.HasEntityClearLosToEntity(player.Handle, llVeh.Handle, 17))
                     {
                         double llVehSpeed = round(GetVehSpeed(llVeh));
+                        // Radar calibration
+                        if (!calibrated)
+                        {
+                            bool shouldSubtract = new Random().NextDouble() > 0.5;
+                            int toChange = new Random().Next(7);
+                            if (shouldSubtract)
+                                llVehSpeed -= toChange;
+                            else
+                                llVehSpeed += toChange;
+                        }
+
                         double llVehHeading = round(llVeh.Heading);
                         double myHdg = round(vehicle.Heading);
                         double diff = Math.Abs(myHdg - llVehHeading);
@@ -742,6 +795,17 @@ namespace Dojrp.Fivem.WraithRS.Client
                     if (API.HasEntityClearLosToEntity(player.Handle, lrVeh.Handle, 17))
                     {
                         double lrVehSpeed = round(GetVehSpeed(lrVeh));
+                        // Radar calibration
+                        if (!calibrated)
+                        {
+                            bool shouldSubtract = new Random().NextDouble() > 0.5;
+                            int toChange = new Random().Next(7);
+                            if (shouldSubtract)
+                                lrVehSpeed -= toChange;
+                            else
+                                lrVehSpeed += toChange;
+                        }
+
                         double lrVehHeading = round(lrVeh.Heading);
                         double myHdg = round(vehicle.Heading);
                         double diff = Math.Abs(myHdg - lrVehHeading);
