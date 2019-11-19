@@ -39,6 +39,18 @@ $( function() {
     window.addEventListener( 'message', function( event ) {
         var item = event.data;
 
+        // Radar gun
+        if (item.type == "lidar") {
+            if (item.action == "open") {
+                $('#lasergun').show();
+            } else if (item.action == "close") {
+                $('#lasergun').hide();
+            } else {
+                $('#radar-speed').text(event.data.speed);
+                $('#radar-range').text(round(event.data.range, 1) + "m");
+            }
+        }
+
         if ( item.resourcename ) {
             resourceName = item.resourcename;
         }
@@ -220,4 +232,9 @@ function sendData( name, data ) {
             console.log( datab );
         }
     } );
+}
+
+function round(value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
 }

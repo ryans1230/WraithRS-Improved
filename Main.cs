@@ -10,7 +10,7 @@ namespace Dojrp.Fivem.WraithRS.Client
 {
     public class Main : BaseScript
     {
-        protected bool radarEnabled, hidden, frontFast, rearFast, locked, debugging, calibrated = false;
+        protected bool radarEnabled, hidden, frontFast, rearFast, locked, debugging, calibrated, lidarShown = false;
         protected RadarInfo radarInfo = new RadarInfo();
 
         public Main()
@@ -53,6 +53,7 @@ namespace Dojrp.Fivem.WraithRS.Client
         [Tick]
         private async Task SecondaryTick()
         {
+            ManageLidar();
             Ped player = Game.PlayerPed;
             bool inVeh = player.IsSittingInVehicle();
             Vehicle veh = player.CurrentVehicle;
@@ -125,12 +126,14 @@ namespace Dojrp.Fivem.WraithRS.Client
 
         private string FormatSpeed(double speed)
         {
+            if (speed < 0)
+                speed = 0;
             return speed.ToString("000");
         }
 
-        private int GetVehicleInDirectionSphere(int entFrom, Vector3 coordFrom, Vector3 coordTo)
+        private int GetVehicleInDirectionSphere(int entFrom, Vector3 coordFrom, Vector3 coordTo, float radius = 4f)
         {
-            int rayhandle = API.StartShapeTestCapsule(coordFrom.X, coordFrom.Y, coordFrom.Z, coordTo.X, coordTo.Y, coordTo.Z, 4f, 10, entFrom, 7);
+            int rayhandle = API.StartShapeTestCapsule(coordFrom.X, coordFrom.Y, coordFrom.Z, coordTo.X, coordTo.Y, coordTo.Z, radius, 10, entFrom, 7);
             bool dump = false;
             Vector3 trash = new Vector3(), trash2 = new Vector3();
             int car = 0;
@@ -844,6 +847,7 @@ namespace Dojrp.Fivem.WraithRS.Client
                 }
             }
 
+
             API.SendNuiMessage(Json.Stringify(new
             {
                 patrolspeed = radarInfo.patrolSpeed,
@@ -858,6 +862,68 @@ namespace Dojrp.Fivem.WraithRS.Client
                 bwdfast = radarInfo.bwdFast,
                 bwddir = radarInfo.bwdDir
             }));
+        }
+
+        private void ManageLidar()
+        {
+            Ped player = Game.PlayerPed;
+            Player p = Game.Player;
+            if (player.Weapons.Current == null)
+                return;
+            if (player.Weapons.Current.Hash != WeaponHash.VintagePistol)
+            {
+                if (lidarShown)
+                {
+                    API.SendNuiMessage(Json.Stringify(new
+                    {
+                        type = "lidar",
+                        action = "close"
+                    }));
+                    lidarShown = false;
+                }
+                return;
+            }
+            if (!lidarShown)
+            {
+                lidarShown = true;
+                API.SendNuiMessage(Json.Stringify(new
+                {
+                    type = "lidar",
+                    action = "open"
+                }));
+            }
+            if (!player.IsAiming)
+                return;
+            
+            Game.DisableControlThisFrame(0, Control.Attack);
+            player.FiringPattern = FiringPattern.FullAuto;
+            Game.DisableControlThisFrame(0, Control.MeleeAttackAlternate);
+            p.DisableFiringThisFrame();
+
+            if (Game.IsDisabledControlPressed(0, Control.Attack))
+            {
+                // Player is shooting a laser
+                Vector3 position = player.Position;
+                Entity target = p.GetTargetedEntity();
+
+                if (target != null && target.Exists())
+                {
+                    Vehicle veh = new Vehicle(target.Handle);
+                    API.DrawLine(position.X, position.Y, position.Z + 0.5f, target.Position.X, target.Position.Y, target.Position.Z, 255, 10, 10, 0xFF);
+                    // Player must be able to see the car (not in third person)
+                    if (API.HasEntityClearLosToEntity(player.Handle, veh.Handle, 17))
+                    {
+                        double vehSpeed = round(GetVehSpeed(veh));
+
+                        API.SendNuiMessage(Json.Stringify(new
+                        {
+                            type = "lidar",
+                            speed = vehSpeed.ToString("000"),
+                            range = API.GetDistanceBetweenCoords(position.X, position.Y, position.Z, veh.Position.X, veh.Position.Y, veh.Position.Z, true)
+                        }));
+                    }
+                }
+            }
         }
 
         [EventHandler("wk:nuiCallback")]

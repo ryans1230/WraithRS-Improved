@@ -13,6 +13,39 @@
     src: url( "digital-7.regular.ttf" );
 }
 
+/* Radar gun*/
+#radar-speed {
+    font-family: "Digital-7" !important;
+    position: absolute;
+    font-weight: bolder;
+    font-size: 30px;
+    left: 41%;
+    top: 42%;
+    color: #282828;
+}
+
+#radar-range {
+    font-family: "Digital-7" !important;
+    position: absolute;
+    font-weight: bolder;
+    font-size: 30px;
+    left: 68%;
+    top: 42%;
+    color: #282828;
+}
+
+#lasergun {
+    display: none;
+    height: 490px;
+    width: 600px;
+    margin-top: 30%;
+    background: url("Radargun.png");
+    overflow: hidden;
+    position: absolute;
+    right: 26%;
+}
+
+
 /* Police Radar */
 #policeradar {
     width: 495px;
